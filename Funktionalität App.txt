@@ -1,0 +1,28 @@
+BLE 
+----
+https://github.com/googlesamples/android-BluetoothLeGatt
+Device discovery
+Manuelle Kopplung -> Toast
+Wird advertised aber nicht erzwungen
+
+Sensoren
+----
+Geschiwindigkeitsbestimmung über GPS https://github.com/googlesamples/android-SpeedTracker/tree/master/Application/src/main
+JSON-Datenpunkte (Intervall?-> einstellbar?)
+
+Views
+----
+Settings
+	Geschwindigkeit, Toleranz, lokale Vibration, Pairing
+Mainscreen
+	State idle: Play button
+	State running: Stop Button, Pause Button, Speed/Time, (Speedplot, Routeplot)
+	State paused: Play button, Stop Button
+	Bluetooth symbol um Pairing zu symbolisieren
+Bluetook pairing, als Toast
+Playbutton -> Bluetooth/GPS
+
+Cloud?
+----
+Upload button nach run
+Webinterface
