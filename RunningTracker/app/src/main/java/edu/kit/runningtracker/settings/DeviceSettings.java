@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by joshr on 22.12.2017.
+ * @author Josh Romanowski
  */
 
 public class DeviceSettings {
@@ -15,13 +15,13 @@ public class DeviceSettings {
     private int numSensors;
     private double maxFrequency;
     private List<BluetoothGattService> services;
-    private String deviceAddresss;
+    private String deviceAddress;
 
     private DeviceSettings() {
         this.numSensors = 0;
         this.maxFrequency = 0;
         this.services = new LinkedList<>();
-        this.deviceAddresss = null;
+        this.deviceAddress = null;
     }
 
     public static DeviceSettings getInstance() {
@@ -30,5 +30,21 @@ public class DeviceSettings {
         } else {
             return mSettings;
         }
+    }
+
+    public int getNumSensors() {
+        return numSensors;
+    }
+
+    public double getMaxFrequency() {
+        return maxFrequency;
+    }
+
+    public void setServices(List<BluetoothGattService> services) {
+        this.services = services;
+    }
+
+    public String getDeviceAddress() {
+        return deviceAddress;
     }
 }

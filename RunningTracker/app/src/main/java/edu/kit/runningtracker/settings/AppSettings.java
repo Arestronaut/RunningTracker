@@ -1,7 +1,7 @@
 package edu.kit.runningtracker.settings;
 
 /**
- * Created by joshr on 19.12.2017.
+ * @author Josh Romanowski
  */
 
 public class AppSettings {
@@ -23,5 +23,17 @@ public class AppSettings {
         } else {
             return mSettings;
         }
+    }
+
+    public boolean isLocal() {
+        return local;
+    }
+
+    public double getDesiredSpeed() {
+        return desiredSpeed;
+    }
+
+    public double getTolerance() {
+        return tolerance;
     }
 }
