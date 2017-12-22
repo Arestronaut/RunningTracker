@@ -12,4 +12,5 @@ public interface IRepository<T> {
     Collection<T> get();
     void update(int id, T element);
     void delete(int id);
+    void save();
 }

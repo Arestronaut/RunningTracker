@@ -5,10 +5,13 @@ package edu.kit.runningtracker.sensor;
  */
 
 public class VelocityService {
+    private IVelocityHandler handler;
+
     public VelocityService(IVelocityHandler handler) {
+        this.handler = handler;
     }
 
     public interface IVelocityHandler {
-        void onVelocityChanged(double velocity);
+        void onVelocityUpdate(double velocity);
     }
 }

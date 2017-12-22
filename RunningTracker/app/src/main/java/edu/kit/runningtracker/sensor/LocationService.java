@@ -1,14 +1,16 @@
 package edu.kit.runningtracker.sensor;
 
-import edu.kit.runningtracker.data.Location;
+import android.location.Location;
 
 /**
  * Created by joshr on 19.12.2017.
  */
 
 public class LocationService {
-    public LocationService(ILocationHandler handler) {
+    private ILocationHandler mHandler;
 
+    public LocationService(ILocationHandler handler) {
+        mHandler = handler;
     }
 
     public interface ILocationHandler {

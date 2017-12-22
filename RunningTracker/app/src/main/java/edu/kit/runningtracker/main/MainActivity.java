@@ -9,6 +9,6 @@ import edu.kit.runningtracker.sensor.VelocityService;
  */
 
 public class MainActivity extends Activity {
-    private IState state;
+    private AState state;
     private VelocityService service;
 }
