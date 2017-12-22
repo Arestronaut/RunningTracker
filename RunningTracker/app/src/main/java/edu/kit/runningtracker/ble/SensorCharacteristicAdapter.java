@@ -3,7 +3,7 @@ package edu.kit.runningtracker.ble;
 import android.bluetooth.BluetoothGattCharacteristic;
 
 /**
- * Created by joshr on 19.12.2017.
+ * @author Josh Romanowski
  */
 
 public class SensorCharacteristicAdapter {
