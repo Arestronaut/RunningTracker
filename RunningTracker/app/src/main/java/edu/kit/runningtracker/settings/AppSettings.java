@@ -7,14 +7,14 @@ package edu.kit.runningtracker.settings;
 public class AppSettings {
     private static AppSettings mSettings = null;
 
-    private double desiredSpeed;
-    private double tolerance;
-    private boolean local;
+    private double mDesiredSpeed;
+    private double mTolerance;
+    private boolean mLocal;
 
     private AppSettings() {
-        this.desiredSpeed = 0;
-        this.tolerance = 10;
-        this.local = false;
+        this.mDesiredSpeed = 0;
+        this.mTolerance = 10;
+        this.mLocal = true;
     }
 
     public static AppSettings getInstance() {
@@ -26,14 +26,20 @@ public class AppSettings {
     }
 
     public boolean isLocal() {
-        return local;
+        return mLocal;
     }
+
+    public void setLocal(boolean local) { mLocal = local; }
 
     public double getDesiredSpeed() {
-        return desiredSpeed;
+        return mDesiredSpeed;
     }
 
+    public void setDesiredSpeed(double desiredSpeed) { mDesiredSpeed = desiredSpeed; }
+
     public double getTolerance() {
-        return tolerance;
+        return mTolerance;
     }
+
+    public void setTolerance(double tolerance) { mTolerance = tolerance; }
 }

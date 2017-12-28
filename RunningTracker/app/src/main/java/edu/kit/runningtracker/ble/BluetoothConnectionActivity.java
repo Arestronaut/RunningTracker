@@ -79,6 +79,7 @@ public class BluetoothConnectionActivity extends Activity {
                     Intent data = new Intent();
                     data.putExtra("DeviceAdress", device.getAddress());
                     setResult(REQUEST_SCAN_BLE, data);
+                    finish();
                 }
             };
 

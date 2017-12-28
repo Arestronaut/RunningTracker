@@ -1,5 +1,6 @@
 package edu.kit.runningtracker.ble;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -29,9 +30,6 @@ public class BluetoothLeService {
     public static final int STATE_DISCONNECTED = 0;
     public static final int STATE_CONNECTING = 1;
     public static final int STATE_CONNECTED = 2;
-
-    public final static UUID UUID_HAPTIC_SENSOR =
-            UUID.fromString("TODO");
 
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
@@ -83,9 +81,12 @@ public class BluetoothLeService {
     };
 
     public boolean connect() {
+        if (mConnectionState == STATE_CONNECTED)
+            return true;
+
         final String address = DeviceSettings.getInstance().getDeviceAddress();
         if (mBluetoothAdapter == null || address == null) {
-            Log.w(TAG, "BluetoothAdapter not initialized or unspecified address.");
+            Log.w(TAG, "Device not initialized");
             return false;
         }
 
