@@ -12,16 +12,16 @@ import java.util.List;
 public class DeviceSettings {
     private static DeviceSettings mSettings = null;
 
-    private int numSensors;
-    private double maxFrequency;
-    private List<BluetoothGattService> services;
-    private String deviceAddress;
+    private int mNumSensors;
+    private double mMaxFrequency;
+    private List<BluetoothGattService> mServices;
+    private String mDeviceAddress;
 
     private DeviceSettings() {
-        this.numSensors = 0;
-        this.maxFrequency = 0;
-        this.services = new LinkedList<>();
-        this.deviceAddress = null;
+        this.mNumSensors = 0;
+        this.mMaxFrequency = 0;
+        this.mServices = new LinkedList<>();
+        this.mDeviceAddress = null;
     }
 
     public static DeviceSettings getInstance() {
@@ -33,18 +33,22 @@ public class DeviceSettings {
     }
 
     public int getNumSensors() {
-        return numSensors;
+        return mNumSensors;
     }
 
     public double getMaxFrequency() {
-        return maxFrequency;
+        return mMaxFrequency;
     }
 
-    public void setServices(List<BluetoothGattService> services) {
-        this.services = services;
+    public void addServices(List<BluetoothGattService> services) {
+        this.mServices.addAll(services);
     }
 
     public String getDeviceAddress() {
-        return deviceAddress;
+        return mDeviceAddress;
+    }
+
+    public void setDeviceAddress(String deviceAddress) {
+        mDeviceAddress = deviceAddress;
     }
 }

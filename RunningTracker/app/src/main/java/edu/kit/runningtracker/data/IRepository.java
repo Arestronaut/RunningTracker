@@ -13,4 +13,5 @@ public interface IRepository<T> {
     void update(int id, T element);
     void delete(int id);
     void save();
+    void clear();
 }

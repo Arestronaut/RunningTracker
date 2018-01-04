@@ -27,8 +27,11 @@ import edu.kit.runningtracker.settings.DeviceSettings;
 public class BluetoothLeService {
     private static final String TAG = BluetoothLeService.class.getSimpleName();
 
-    public static final int STATE_DISCONNECTED = 0;
-    public static final int STATE_CONNECTING = 1;
+    private static final int STATE_DISCONNECTED = 0;
+    private static final int STATE_CONNECTING = 1;
+    /**
+     * Service is currently connected and ready for actions.
+     */
     public static final int STATE_CONNECTED = 2;
 
     private BluetoothManager mBluetoothManager;
@@ -39,6 +42,10 @@ public class BluetoothLeService {
 
     private Context mContext;
 
+    /**
+     * Creates a new <code>BluetoothLeService</code> and initializes Bluetooth.
+     * @param context current app context.
+     */
     public BluetoothLeService(Context context) {
         mContext = context;
 
@@ -80,11 +87,15 @@ public class BluetoothLeService {
         }
     };
 
-    public boolean connect() {
+    /**
+     * Connects to the given BLE device.
+     * @return Status of the connection.
+     */
+    public boolean connect(String address) {
         if (mConnectionState == STATE_CONNECTED)
             return true;
 
-        final String address = DeviceSettings.getInstance().getDeviceAddress();
+
         if (mBluetoothAdapter == null || address == null) {
             Log.w(TAG, "Device not initialized");
             return false;
@@ -114,6 +125,9 @@ public class BluetoothLeService {
         return true;
     }
 
+    /**
+     * Disconnects the connected device.
+     */
     public void disconnect() {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w(TAG, "BluetoothAdapter not initialized");
@@ -122,6 +136,9 @@ public class BluetoothLeService {
         mBluetoothGatt.disconnect();
     }
 
+    /**
+     * Finalizes the gatt.
+     */
     public void close() {
         if (mBluetoothGatt == null) {
             return;
@@ -136,9 +153,14 @@ public class BluetoothLeService {
         return mBluetoothGatt.getServices();
     }
 
+    /**
+     * Writes a characteristic to the gatt server. Skips if gatt not available.
+     * @param characteristic Characteristic to write to the server.
+     */
     public void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
-        if (mBluetoothGatt == null || characteristic == null) {
+        if (mBluetoothGatt == null || mConnectionState != STATE_CONNECTED) {
             Log.w(TAG, "Gatt not available");
+            return;
         }
 
         if (!mBluetoothGatt.writeCharacteristic(characteristic)) {

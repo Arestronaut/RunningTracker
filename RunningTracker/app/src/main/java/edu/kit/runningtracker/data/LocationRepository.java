@@ -49,4 +49,9 @@ public class LocationRepository implements IRepository<Location> {
     public void save() {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public void clear() {
+        mLocations = new LinkedList<>();
+    }
 }

@@ -12,10 +12,12 @@ public class StateRunning implements IState {
     @Override
     public void enter(RunFragment context) {
         Log.i(TAG, "Entered running state");
+        context.startServics();
     }
 
     @Override
     public void exit(RunFragment context) {
         Log.i(TAG, "Left running state");
+        context.pauseServices();
     }
 }

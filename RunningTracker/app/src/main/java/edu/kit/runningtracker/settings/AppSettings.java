@@ -8,6 +8,7 @@ public class AppSettings {
     private static AppSettings mSettings = null;
 
     private double mDesiredSpeed;
+    private double mDeadzone;
     private double mTolerance;
     private boolean mLocal;
 
@@ -15,6 +16,7 @@ public class AppSettings {
         this.mDesiredSpeed = 0;
         this.mTolerance = 10;
         this.mLocal = true;
+        this.mDeadzone = 0;
     }
 
     public static AppSettings getInstance() {
@@ -42,4 +44,12 @@ public class AppSettings {
     }
 
     public void setTolerance(double tolerance) { mTolerance = tolerance; }
+
+    public double getDeadzone() {
+        return mDeadzone;
+    }
+
+    public void setDeadzone(double mDeadzone) {
+        this.mDeadzone = mDeadzone;
+    }
 }

@@ -11,11 +11,11 @@ public class StateIdle implements IState {
 
     @Override
     public void enter(RunFragment context) {
-        Log.i(TAG, "Entered idle state");
+        context.resetServices();
     }
 
     @Override
     public void exit(RunFragment context) {
-        Log.i(TAG, "Left idle state");
+        context.setupServices();
     }
 }
