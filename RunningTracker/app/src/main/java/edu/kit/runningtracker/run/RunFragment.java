@@ -70,8 +70,6 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
         mBleSetup = false;
         mLocationRepository = new LocationRepository();
 
-        mPauseButton.setEnabled(false);
-        mStopButton.setEnabled(false);
     }
 
     // We need to wait for the context to get valid.
@@ -112,6 +110,7 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
         });
 
         mPauseButton = view.findViewById(R.id.pause_button);
+        mPauseButton.setEnabled(false);
         mPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -123,6 +122,7 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
         });
 
         mStopButton = view.findViewById(R.id.stop_button);
+        mStopButton.setEnabled(false);
         mStopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
