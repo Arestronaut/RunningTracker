@@ -110,7 +110,6 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
         });
 
         mSpeedTextView = view.findViewById(R.id.speedTextView);
-        mSpeedTextView.append("00.00");
 
         mStopButton = view.findViewById(R.id.stop_button);
         mStopButton.setEnabled(false);
