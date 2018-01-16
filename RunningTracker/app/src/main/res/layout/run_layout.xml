@@ -1,18 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
-        android:layout_height="62dp"
-        android:text="" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="bottom"
+        android:layout_above="@id/buttonLayout">
+
+        <TextView
+            android:id="@+id/speedTextView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="00.00"
+            android:textAlignment="center"
+            android:textSize="50sp" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/buttonLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:orientation="horizontal">
 
         <Button
@@ -21,14 +33,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/button_start" />
-
-        <Button
-            android:id="@+id/pause_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/button_pause" />
-
         <Button
             android:id="@+id/stop_button"
             android:layout_width="wrap_content"
@@ -37,4 +41,4 @@
             android:text="@string/button_stop" />
     </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>

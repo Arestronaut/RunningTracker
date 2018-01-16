@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import edu.kit.runningtracker.R;
 import edu.kit.runningtracker.ble.BluetoothConnectionActivity;
@@ -44,8 +45,8 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
     private IState mCurrentState;
 
     // View
+    private TextView mSpeedTextView;
     private Button mStartButton;
-    private Button mPauseButton;
     private Button mStopButton;
 
     // Sensors and actors
@@ -104,22 +105,12 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
             public void onClick(View v) {
                 setState(new StateRunning());
                 mStartButton.setEnabled(false);
-                mPauseButton.setEnabled(true);
                 mStopButton.setEnabled(true);
             }
         });
 
-        mPauseButton = view.findViewById(R.id.pause_button);
-        mPauseButton.setEnabled(false);
-        mPauseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setState(new StatePaused());
-                mPauseButton.setEnabled(false);
-                mStartButton.setEnabled(true);
-                mStopButton.setEnabled(true);
-            }
-        });
+        mSpeedTextView = view.findViewById(R.id.speedTextView);
+        mSpeedTextView.append("00.00");
 
         mStopButton = view.findViewById(R.id.stop_button);
         mStopButton.setEnabled(false);
@@ -128,7 +119,6 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
             public void onClick(View v) {
                 setState(new StateIdle());
                 mStopButton.setEnabled(false);
-                mPauseButton.setEnabled(false);
                 mStartButton.setEnabled(true);
             }
         });
@@ -148,6 +138,8 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
             mLocationRepository.put(location);
 
             double speedInMps = location.getSpeed() * Constants.MPH_IN_METERS_PER_SECOND;
+            mSpeedTextView.append(String.valueOf(speedInMps));
+
             if (!mAppSettings.isLocal()) {
                 if (mBleService == null
                         || mBleService.getConnectionState() != BluetoothLeService.STATE_CONNECTED) {

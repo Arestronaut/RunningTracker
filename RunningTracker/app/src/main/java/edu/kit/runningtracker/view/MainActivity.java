@@ -32,6 +32,13 @@ public class MainActivity extends AppCompatActivity {
         setupTablayout();
 
     }
+    
+    private void setupViewPager(ViewPager viewPager) {
+        CustomPagerAdapter adapter = new CustomPagerAdapter(getSupportFragmentManager());
+        adapter.addFragment(new RunFragment(), getString(R.string.action_run));
+        adapter.addFragment(new SettingsFragment(), getString(R.string.action_settings));
+        viewPager.setAdapter(adapter);
+    }
 
     private void setupTablayout() {
         TabLayout tabLayout = findViewById(R.id.sliding_tabs);
@@ -66,12 +73,5 @@ public class MainActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             return mFragmentTitleList.get(position);
         }
-    }
-
-    private void setupViewPager(ViewPager viewPager) {
-        CustomPagerAdapter adapter = new CustomPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new RunFragment(), getString(R.string.action_run));
-        adapter.addFragment(new SettingsFragment(), getString(R.string.action_settings));
-        viewPager.setAdapter(adapter);
     }
 }
