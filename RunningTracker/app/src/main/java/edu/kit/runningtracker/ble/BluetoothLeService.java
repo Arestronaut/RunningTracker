@@ -10,6 +10,7 @@ import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
+import android.nfc.Tag;
 import android.util.Log;
 
 import java.util.List;
@@ -155,13 +156,25 @@ public class BluetoothLeService {
 
     /**
      * Writes a characteristic to the gatt server. Skips if gatt not available.
-     * @param characteristic Characteristic to write to the server.
+     * @param value the value which should be written to the server
+     *
      */
-    public void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
+    public void writeCharacteristic(int value) {
         if (mBluetoothGatt == null || mConnectionState != STATE_CONNECTED) {
             Log.w(TAG, "Gatt not available");
             return;
         }
+
+        BluetoothGattService service = getSupportedGattServices().iterator().next();
+        if (service == null) {
+            Log.e(TAG, "No service available");
+            return;
+        }
+
+        int newValue = value <= 0 ? 0 : 1;
+
+        BluetoothGattCharacteristic characteristic = service.getCharacteristic(UUID.fromString(""));
+        characteristic.setValue(newValue, BluetoothGattCharacteristic.FORMAT_UINT8, 0);
 
         if (!mBluetoothGatt.writeCharacteristic(characteristic)) {
             Log.e(TAG, "Initializing writing characteristic failed");
