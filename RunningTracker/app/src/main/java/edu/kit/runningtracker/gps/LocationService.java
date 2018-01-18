@@ -45,7 +45,8 @@ public class LocationService implements LocationListener {
             System.out.println("Start receiving location updates");
 
             mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
-            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                    0, 0, this);
         }
     }
 
@@ -66,27 +67,19 @@ public class LocationService implements LocationListener {
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-
     }
 
     @Override
     public void onProviderEnabled(String provider) {
-
     }
 
     @Override
     public void onProviderDisabled(String provider) {
-
     }
 
 
 
     public interface ILocationHandler {
         void onLocationChanged(Location location);
-    }
-
-    public interface ILocationPermissionHandler {
-        void checkPermission();
-        boolean hasPermission();
     }
 }
