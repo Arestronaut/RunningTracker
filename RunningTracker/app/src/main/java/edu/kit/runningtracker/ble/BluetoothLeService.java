@@ -182,7 +182,8 @@ public class BluetoothLeService {
         }
 
         // TODO: Characteristic uuid
-        BluetoothGattCharacteristic characteristic = service.getCharacteristic(UUID.fromString(""));
+        BluetoothGattCharacteristic characteristic = service.
+                getCharacteristic(UUID.fromString("68084313-9757-420f-9f75-bf7f51f1f1bc"));
         characteristic.setValue(newValue, BluetoothGattCharacteristic.FORMAT_UINT8, 0);
 
         if (!mBluetoothGatt.writeCharacteristic(characteristic)) {
