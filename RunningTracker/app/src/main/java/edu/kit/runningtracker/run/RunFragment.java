@@ -34,6 +34,7 @@ import edu.kit.runningtracker.settings.Constants;
 import edu.kit.runningtracker.settings.DeviceSettings;
 
 import static android.app.Activity.RESULT_OK;
+import static android.content.Context.APPWIDGET_SERVICE;
 import static edu.kit.runningtracker.ble.BluetoothConnectionActivity.REQUEST_SCAN_BLE;
 
 /**
@@ -56,7 +57,6 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
 
     // Sensors and actors
     private BluetoothLeService mBleService;
-    private AppSettings mAppSettings;
     private DeviceSettings mDeviceSettings;
     private LocationService mLocationService;
     private LocationRepository mLocationRepository;
@@ -68,7 +68,6 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
 
     public RunFragment() {
         mCurrentState = new StateIdle();
-        mAppSettings = AppSettings.getInstance();
         mDeviceSettings = DeviceSettings.getInstance();
 
         mBleSetup = false;
@@ -153,19 +152,31 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
             double speedInMps = location.getSpeed() * Constants.MPH_IN_METERS_PER_SECOND;
             mSpeedTextView.append(String.valueOf(speedInMps));
 
+            int speed = AppSettings.getInstance().useLocation() ?
+                    (int) speedInMps :
+                    (int) AppSettings.getInstance().getSpeed();
+            int desiredSpeed =  (int) AppSettings.getInstance().getDesiredSpeed();
+            int tolerance = (int) AppSettings.getInstance().getTolerance();
+
             if (System.currentTimeMillis() - lastTime > frequency) {
-                if (speedInMps < mAppSettings.getDesiredSpeed() - mAppSettings.getTolerance()) {
+                if (speed < desiredSpeed - tolerance) {
                     // too slow
                     frequency = Constants.LOW_FREQUENCY;
                     isOff = !isOff;
-                } else if (speedInMps > mAppSettings.getDesiredSpeed() + mAppSettings.getTolerance()) {
+
+                    mInformationTextView.setText("Too slow");
+                } else if (speed > desiredSpeed + tolerance) {
                     // too fast
                     frequency = Constants.HIGH_FREQUENCY;
                     isOff = !isOff;
+
+                    mInformationTextView.setText("Too fast");
                 } else {
                     // OFF
                     frequency = Constants.OFF_FREQUENCY;
                     isOff = true;
+
+                    mInformationTextView.setText("off");
                 }
 
                 Log.d(TAG, String.valueOf(isOff));
@@ -222,7 +233,7 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
     }
 
     protected void startServics() {
-        if (!mAppSettings.isLocal() && mBleSetup) {
+        if (!AppSettings.getInstance().isLocal() && mBleSetup) {
             mBleService.connect(mDeviceSettings.getDeviceAddress());
         }
     }

@@ -5,26 +5,20 @@ package edu.kit.runningtracker.settings;
  */
 
 public class AppSettings {
-    private static AppSettings mSettings = null;
+    private static final AppSettings mSettings = new AppSettings();
 
-    private double mDesiredSpeed;
-    private double mDeadzone;
-    private double mTolerance;
-    private boolean mLocal;
+    private double mDesiredSpeed = 10;
+    private double mDeadzone = 0;
+    private double mTolerance = 0;
+    private boolean mLocal = true;
+    private double mSpeed = 10;
+    private boolean mUseLocation = false;
 
     private AppSettings() {
-        this.mDesiredSpeed = 0;
-        this.mTolerance = 10;
-        this.mLocal = true;
-        this.mDeadzone = 0;
     }
 
     public static AppSettings getInstance() {
-        if (mSettings == null) {
-            return new AppSettings();
-        } else {
-            return mSettings;
-        }
+        return mSettings;
     }
 
     public boolean isLocal() {
@@ -51,5 +45,21 @@ public class AppSettings {
 
     public void setDeadzone(double mDeadzone) {
         this.mDeadzone = mDeadzone;
+    }
+
+    public double getSpeed() {
+        return mSpeed;
+    }
+
+    public void setSpeed(double mSpeed) {
+        this.mSpeed = mSpeed;
+    }
+
+    public boolean useLocation() {
+        return mUseLocation;
+    }
+
+    public void setUseLocation(boolean mUseLocation) {
+        this.mUseLocation = mUseLocation;
     }
 }

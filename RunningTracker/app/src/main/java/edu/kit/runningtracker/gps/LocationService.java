@@ -45,7 +45,13 @@ public class LocationService implements LocationListener {
             System.out.println("Start receiving location updates");
 
             mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
-            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+
+            if (mLocationManager == null) {
+                Log.e(TAG, "location manager is null");
+                return;
+            }
+
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                     0, 0, this);
         }
     }
@@ -60,7 +66,7 @@ public class LocationService implements LocationListener {
     public void onLocationChanged(Location location) {
         System.out.println("Location changed");
         Log.d(TAG, "onLocationChanged() : " + location);
-        if (location.getSpeed() > mAppSettings.getDeadzone()) {
+        if (location.getSpeed() >= mAppSettings.getDeadzone()) {
             mHandler.onLocationChanged(location);
         }
     }
@@ -76,8 +82,6 @@ public class LocationService implements LocationListener {
     @Override
     public void onProviderDisabled(String provider) {
     }
-
-
 
     public interface ILocationHandler {
         void onLocationChanged(Location location);

@@ -31,4 +31,8 @@ public class DecoratedSeekBar {
     public double getProgress() {
         return mSeekBar.getProgress();
     }
+
+    public void setEnabled(boolean enabled) {
+        mSeekBar.setEnabled(enabled);
+    }
 }
