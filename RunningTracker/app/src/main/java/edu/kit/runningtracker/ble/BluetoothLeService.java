@@ -156,7 +156,7 @@ public class BluetoothLeService {
 
     /**
      * Writes a characteristic to the gatt server. Skips if gatt not available.
-     * @param value the value which should be written to the server
+     * @param value the value which should be written to the server (0 = low frequent, 1 = stop, 2 = high frequent)
      *
      */
     public void writeCharacteristic(int value) {
@@ -171,8 +171,17 @@ public class BluetoothLeService {
             return;
         }
 
-        int newValue = value <= 0 ? 0 : 1;
+        int newValue = -1;
 
+        if (value <= 0) {
+            newValue = 0;
+        } else if (value >= 2) {
+            newValue = 2;
+        } else {
+            newValue = 1;
+        }
+
+        // TODO: Characteristic uuid
         BluetoothGattCharacteristic characteristic = service.getCharacteristic(UUID.fromString(""));
         characteristic.setValue(newValue, BluetoothGattCharacteristic.FORMAT_UINT8, 0);
 

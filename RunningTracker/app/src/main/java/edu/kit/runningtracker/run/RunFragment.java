@@ -144,9 +144,6 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
                         || mBleService.getConnectionState() != BluetoothLeService.STATE_CONNECTED) {
                     Log.w(TAG, "Service not connected");
                 }
-
-                BluetoothGattCharacteristic characteristic = mAdapter.createCharacteristic(speedInMps);
-                mBleService.writeCharacteristic(characteristic);
             }
         }
     };
