@@ -29,18 +29,20 @@ public class SettingsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.settings_layout, container, false);
+        AppSettings appSettings = AppSettings.getInstance();
 
         SeekBar desiredSpeedBar = view.findViewById(R.id.desired_speed_bar);
         final TextView desiredSpeedValue = view.findViewById(R.id.desired_speed_value);
-        mDesiredSpeed = new DecoratedSeekBar(desiredSpeedBar, desiredSpeedValue);
+        mDesiredSpeed = new DecoratedSeekBar(
+                desiredSpeedBar, desiredSpeedValue, appSettings.getDesiredSpeed());
 
         SeekBar toleranceBar = view.findViewById(R.id.tolerance_bar);
         final TextView toleranceValue = view.findViewById(R.id.tolerance_value);
-        mTolerance = new DecoratedSeekBar(toleranceBar, toleranceValue);
+        mTolerance = new DecoratedSeekBar(toleranceBar, toleranceValue, appSettings.getTolerance());
 
         SeekBar speedBar = view.findViewById(R.id.speed_bar);
         final TextView speedValue = view.findViewById(R.id.speed_value);
-        mSpeed = new DecoratedSeekBar(speedBar, speedValue);
+        mSpeed = new DecoratedSeekBar(speedBar, speedValue, appSettings.getSpeed());
 
         mLocal = view.findViewById(R.id.local_checkbox);
         mUseLocation = view.findViewById(R.id.uselocation_checkbox);
@@ -58,7 +60,7 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 AppSettings settings = AppSettings.getInstance();
-                
+
                 settings.setDesiredSpeed(mDesiredSpeed.getProgress());
                 settings.setTolerance(mTolerance.getProgress());
                 settings.setLocal(mLocal.isChecked());

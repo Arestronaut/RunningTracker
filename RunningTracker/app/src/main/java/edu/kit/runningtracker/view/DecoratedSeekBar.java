@@ -10,9 +10,10 @@ import android.widget.TextView;
 public class DecoratedSeekBar {
     private SeekBar mSeekBar;
 
-    public DecoratedSeekBar(SeekBar seekBar, final TextView valueView) {
+    public DecoratedSeekBar(SeekBar seekBar, final TextView valueView, int initial) {
         mSeekBar = seekBar;
-        valueView.setText(String.valueOf(seekBar.getProgress()));
+        mSeekBar.setProgress(initial);
+        valueView.setText(String.valueOf(initial));
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -28,7 +29,7 @@ public class DecoratedSeekBar {
         });
     }
 
-    public double getProgress() {
+    public int getProgress() {
         return mSeekBar.getProgress();
     }
 

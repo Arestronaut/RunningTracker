@@ -7,42 +7,60 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.List;
-
-import edu.kit.runningtracker.data.LocationRepository;
 import edu.kit.runningtracker.settings.AppSettings;
 
 /**
- * Created by joshr on 19.12.2017.
+ * @author Josh Romanowski
  */
 
-public class LocationService implements LocationListener {
+public class LocationService {
     private static final String TAG = LocationService.class.getSimpleName();
 
-    private ILocationHandler mHandler;
     private AppSettings mAppSettings;
     private Context mContext;
     private LocationManager mLocationManager;
 
-    public LocationService(ILocationHandler handler, Context context) {
-        mHandler = handler;
+    private double mSpeed;
+
+    public LocationService(Context context) {
         mAppSettings = AppSettings.getInstance();
         mContext = context;
+        mSpeed = 0;
     }
 
+    private LocationListener mListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+            Log.d(TAG, "Location changed : " + location);
+            if (location.getSpeed() >= mAppSettings.getDeadzone()) {
+                mSpeed = location.getSpeed();
+            }
+        }
+
+        @Override
+        public void onStatusChanged(String s, int i, Bundle bundle) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String s) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String s) {
+
+        }
+    };
 
     public void start() {
         if (ActivityCompat.checkSelfPermission(mContext,
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(mContext,
                 Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            System.out.println("Start receiving location updates");
 
             mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 
@@ -51,39 +69,20 @@ public class LocationService implements LocationListener {
                 return;
             }
 
+            Log.i(TAG, "Stop receiving location updates");
             mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                    0, 0, this);
+                    0, 0, mListener);
+        } else {
+            Log.w(TAG, "Missing permissions");
         }
     }
 
     public void stop() {
-        System.out.println("Stop receiving location updates");
-
-        mLocationManager.removeUpdates(this);
+        Log.i(TAG, "Stop receiving location updates");
+        mLocationManager.removeUpdates(mListener);
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
-        System.out.println("Location changed");
-        Log.d(TAG, "onLocationChanged() : " + location);
-        if (location.getSpeed() >= mAppSettings.getDeadzone()) {
-            mHandler.onLocationChanged(location);
-        }
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-    }
-
-    public interface ILocationHandler {
-        void onLocationChanged(Location location);
+    public double getSpeed() {
+        return AppSettings.getInstance().useLocation() ? mSpeed : AppSettings.getInstance().getSpeed();
     }
 }

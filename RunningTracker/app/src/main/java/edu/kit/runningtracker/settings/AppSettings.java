@@ -7,11 +7,11 @@ package edu.kit.runningtracker.settings;
 public class AppSettings {
     private static final AppSettings mSettings = new AppSettings();
 
-    private double mDesiredSpeed = 10;
-    private double mDeadzone = 0;
-    private double mTolerance = 0;
+    private int mDesiredSpeed = 10;
+    private int mDeadzone = 0;
+    private int mTolerance = 0;
+    private int mSpeed = 10;
     private boolean mLocal = true;
-    private double mSpeed = 10;
     private boolean mUseLocation = false;
 
     private AppSettings() {
@@ -27,31 +27,35 @@ public class AppSettings {
 
     public void setLocal(boolean local) { mLocal = local; }
 
-    public double getDesiredSpeed() {
+    public int getDesiredSpeed() {
         return mDesiredSpeed;
     }
 
-    public void setDesiredSpeed(double desiredSpeed) { mDesiredSpeed = desiredSpeed; }
+    public void setDesiredSpeed(int desiredSpeed) {
+        mDesiredSpeed = desiredSpeed;
+    }
 
-    public double getTolerance() {
+    public int getTolerance() {
         return mTolerance;
     }
 
-    public void setTolerance(double tolerance) { mTolerance = tolerance; }
+    public void setTolerance(int tolerance) {
+        mTolerance = tolerance;
+    }
 
-    public double getDeadzone() {
+    public int getDeadzone() {
         return mDeadzone;
     }
 
-    public void setDeadzone(double mDeadzone) {
+    public void setDeadzone(int mDeadzone) {
         this.mDeadzone = mDeadzone;
     }
 
-    public double getSpeed() {
+    public int getSpeed() {
         return mSpeed;
     }
 
-    public void setSpeed(double mSpeed) {
+    public void setSpeed(int mSpeed) {
         this.mSpeed = mSpeed;
     }
 

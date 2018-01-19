@@ -1,6 +1,5 @@
 package edu.kit.runningtracker.ble;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -10,13 +9,9 @@ import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
-import android.nfc.Tag;
 import android.util.Log;
 
 import java.util.List;
-import java.util.UUID;
-
-import edu.kit.runningtracker.settings.DeviceSettings;
 
 /**
  * Service for managing a ble connection to a given device.
@@ -134,6 +129,7 @@ public class BluetoothLeService {
             Log.w(TAG, "BluetoothAdapter not initialized");
             return;
         }
+        Log.i(TAG, "Disconnecting gatt server");
         mBluetoothGatt.disconnect();
     }
 
@@ -144,6 +140,7 @@ public class BluetoothLeService {
         if (mBluetoothGatt == null) {
             return;
         }
+        Log.i(TAG, "Closing gatt server");
         mBluetoothGatt.close();
         mBluetoothGatt = null;
     }
