@@ -222,13 +222,6 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
                                 Manifest.permission.ACCESS_COARSE_LOCATION},
                         REQUEST_GPS_PERMISSIONS);
             }
-        } else {
-            String toastText = "The app requires permission to access the devices GPS. " +
-                    "To use the service please grant the necessary permissions";
-            Toast toast = Toast.makeText(mContext, toastText, Toast.LENGTH_LONG);
-            toast.setGravity(Gravity.TOP|Gravity.CENTER, 0,16);
-
-            toast.show();
         }
     }
 
