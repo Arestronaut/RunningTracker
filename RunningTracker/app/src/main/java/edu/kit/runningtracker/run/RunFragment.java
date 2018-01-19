@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -48,6 +49,7 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
 
     // View
     private TextView mSpeedTextView;
+    private TextView mInformationTextView;
     private Button mStartButton;
     private Button mStopButton;
 
@@ -57,7 +59,6 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
     private DeviceSettings mDeviceSettings;
     private LocationService mLocationService;
     private LocationRepository mLocationRepository;
-    private SensorCharacteristicAdapter mAdapter;
 
     private boolean mBleSetup;
     private boolean mGpsSetup;
@@ -69,7 +70,6 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
         mAppSettings = AppSettings.getInstance();
         mDeviceSettings = DeviceSettings.getInstance();
 
-        mAdapter = new SensorCharacteristicAdapter();
         mBleSetup = false;
         mLocationRepository = new LocationRepository();
 
@@ -118,6 +118,7 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
         });
 
         mSpeedTextView = view.findViewById(R.id.speedTextView);
+        mInformationTextView = view.findViewById(R.id.informationTextView);
 
         mStopButton = view.findViewById(R.id.stop_button);
         mStopButton.setEnabled(false);
@@ -144,10 +145,29 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
     private LocationService.ILocationHandler mLocationHandler = new LocationService.ILocationHandler() {
         @Override
         public void onLocationChanged(Location location) {
-  //          mLocationRepository.put(location);
-
             double speedInMps = location.getSpeed() * Constants.MPH_IN_METERS_PER_SECOND;
             mSpeedTextView.append(String.valueOf(speedInMps));
+
+            if (speedInMps > mAppSettings.getDesiredSpeed() + mAppSettings.getTolerance()) {
+                Log.d(TAG, "Too fast");
+
+                mSpeedTextView.setTextColor(Color.RED);
+
+                mInformationTextView.setTextColor(Color.RED);
+                mInformationTextView.append("Too fast");
+            } else if (speedInMps < mAppSettings.getDesiredSpeed() - mAppSettings.getTolerance()) {
+                Log.d(TAG, "Too slow");
+
+                mSpeedTextView.setTextColor(Color.RED);
+
+                mInformationTextView.setTextColor(Color.RED);
+                mInformationTextView.append("Too slow");
+            } else {
+                mSpeedTextView.setTextColor(Color.BLACK);
+
+                mInformationTextView.setTextColor(Color.GREEN);
+                mInformationTextView.append("perfect");
+            }
 
             if (!mAppSettings.isLocal()) {
                 if (mBleService == null
@@ -155,8 +175,8 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
                     Log.w(TAG, "Service not connected");
                 }
 
-                BluetoothGattCharacteristic characteristic = mAdapter.createCharacteristic(speedInMps);
-                mBleService.writeCharacteristic(characteristic);
+                //BluetoothGattCharacteristic characteristic = mAdapter.createCharacteristic(speedInMps);
+                //mBleService.writeCharacteristic(characteristic);
             }
         }
     };
