@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,11 +15,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityCompat.OnRequestPermissionsResultCallback;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import edu.kit.runningtracker.R;
 import edu.kit.runningtracker.ble.BluetoothConnectionActivity;
@@ -47,6 +50,7 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
 
     // View
     private TextView mSpeedTextView;
+    private TextView mInformationTextView;
     private Button mStartButton;
     private Button mStopButton;
 
@@ -56,7 +60,6 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
     private DeviceSettings mDeviceSettings;
     private LocationService mLocationService;
     private LocationRepository mLocationRepository;
-    private SensorCharacteristicAdapter mAdapter;
 
     private boolean mBleSetup;
     private boolean mGpsSetup;
@@ -68,10 +71,10 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
         mAppSettings = AppSettings.getInstance();
         mDeviceSettings = DeviceSettings.getInstance();
 
-        mAdapter = new SensorCharacteristicAdapter();
         mBleSetup = false;
         mLocationRepository = new LocationRepository();
 
+        mGpsSetup = false;
     }
 
     // We need to wait for the context to get valid.
@@ -79,6 +82,9 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
+        setupServices();
+
         mBleService = new BluetoothLeService(context);
         mLocationService = new LocationService(mLocationHandler, context);
         mContext = context;
@@ -107,10 +113,13 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
                 setState(new StateRunning());
                 mStartButton.setEnabled(false);
                 mStopButton.setEnabled(true);
+
+                mLocationService.start();
             }
         });
 
         mSpeedTextView = view.findViewById(R.id.speedTextView);
+        mInformationTextView = view.findViewById(R.id.informationTextView);
 
         mStopButton = view.findViewById(R.id.stop_button);
         mStopButton.setEnabled(false);
@@ -120,6 +129,8 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
                 setState(new StateIdle());
                 mStopButton.setEnabled(false);
                 mStartButton.setEnabled(true);
+
+                mLocationService.stop();
             }
         });
 
@@ -139,8 +150,6 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
     private LocationService.ILocationHandler mLocationHandler = new LocationService.ILocationHandler() {
         @Override
         public void onLocationChanged(Location location) {
-            mLocationRepository.put(location);
-
             double speedInMps = location.getSpeed() * Constants.MPH_IN_METERS_PER_SECOND;
             mSpeedTextView.append(String.valueOf(speedInMps));
 
@@ -186,10 +195,10 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
         }
 
     protected void setupServices() {
-        if (!mAppSettings.isLocal() && !mBleSetup) {
+        /*if (!mAppSettings.isLocal() && !mBleSetup) {
             Intent startBleIntent = new Intent(getContext(), BluetoothConnectionActivity.class);
             startActivityForResult(startBleIntent, REQUEST_SCAN_BLE);
-        }
+        }*/
 
         if (!mGpsSetup) {
             if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
@@ -202,6 +211,13 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
                                 Manifest.permission.ACCESS_COARSE_LOCATION},
                         REQUEST_GPS_PERMISSIONS);
             }
+        } else {
+            String toastText = "The app requires permission to access the devices GPS. " +
+                    "To use the service please grant the necessary permissions";
+            Toast toast = Toast.makeText(mContext, toastText, Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.TOP|Gravity.CENTER, 0,16);
+
+            toast.show();
         }
     }
 
