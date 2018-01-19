@@ -57,7 +57,8 @@ public class BluetoothConnectionActivity extends Activity {
 
         mFilters = new LinkedList<>();
         mFilters.add(new ScanFilter.Builder().setServiceUuid(Constants.SERVICE_NAME).build());
-        mScanSettings = new ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_POWER).build();
+        mScanSettings = new ScanSettings.Builder().
+                setScanMode(ScanSettings.SCAN_MODE_LOW_POWER).build();
 
         if (mBluetoothManager == null) {
             mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
@@ -84,7 +85,8 @@ public class BluetoothConnectionActivity extends Activity {
 
         // Check for BLE support
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.ble_not_supported,
+                    Toast.LENGTH_SHORT).show();
             finish();
         }
 

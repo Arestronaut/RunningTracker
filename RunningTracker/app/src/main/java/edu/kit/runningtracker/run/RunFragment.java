@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityCompat.OnRequestPermissionsResultCallback;
@@ -131,6 +132,10 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
         mCurrentState.enter(this);
     }
 
+    private long lastTime = System.currentTimeMillis();
+    private int frequency = 0;
+    private boolean isOff;
+
     private LocationService.ILocationHandler mLocationHandler = new LocationService.ILocationHandler() {
         @Override
         public void onLocationChanged(Location location) {
@@ -139,14 +144,36 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
             double speedInMps = location.getSpeed() * Constants.MPH_IN_METERS_PER_SECOND;
             mSpeedTextView.append(String.valueOf(speedInMps));
 
-            if (!mAppSettings.isLocal()) {
-                if (mBleService == null
-                        || mBleService.getConnectionState() != BluetoothLeService.STATE_CONNECTED) {
-                    Log.w(TAG, "Service not connected");
+            if (System.currentTimeMillis() - lastTime > frequency) {
+                if (speedInMps < mAppSettings.getDesiredSpeed() - mAppSettings.getTolerance()) {
+                    // too slow
+                    frequency = Constants.LOW_FREQUENCY;
+                    isOff = !isOff;
+                } else if (speedInMps > mAppSettings.getDesiredSpeed() + mAppSettings.getTolerance()) {
+                    // too fast
+                    frequency = Constants.HIGH_FREQUENCY;
+                    isOff = !isOff;
+                } else {
+                    // OFF
+                    frequency = Constants.OFF_FREQUENCY;
+                    isOff = true;
                 }
+
+                Log.d(TAG, String.valueOf(isOff));
+
+//                if (!mAppSettings.isLocal()) {
+//                    if (mBleService == null
+//                            || mBleService.getConnectionState() != BluetoothLeService.STATE_CONNECTED) {
+//                        mBleService.writeCharacteristic(SensorCharacteristicAdapter.
+//                                createCharacteristic(isOff));
+//                        Log.w(TAG, "Service not connected");
+//                    }
+//                }
             }
         }
     };
+
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode,

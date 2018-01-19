@@ -156,10 +156,10 @@ public class BluetoothLeService {
 
     /**
      * Writes a characteristic to the gatt server. Skips if gatt not available.
-     * @param value the value which should be written to the server (0 = low frequent, 1 = stop, 2 = high frequent)
+     * @param characteristic the characteristic
      *
      */
-    public void writeCharacteristic(int value) {
+    public void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
         if (mBluetoothGatt == null || mConnectionState != STATE_CONNECTED) {
             Log.w(TAG, "Gatt not available");
             return;
@@ -170,21 +170,6 @@ public class BluetoothLeService {
             Log.e(TAG, "No service available");
             return;
         }
-
-        int newValue = -1;
-
-        if (value <= 0) {
-            newValue = 0;
-        } else if (value >= 2) {
-            newValue = 2;
-        } else {
-            newValue = 1;
-        }
-
-        // TODO: Characteristic uuid
-        BluetoothGattCharacteristic characteristic = service.
-                getCharacteristic(UUID.fromString("68084313-9757-420f-9f75-bf7f51f1f1bc"));
-        characteristic.setValue(newValue, BluetoothGattCharacteristic.FORMAT_UINT8, 0);
 
         if (!mBluetoothGatt.writeCharacteristic(characteristic)) {
             Log.e(TAG, "Initializing writing characteristic failed");

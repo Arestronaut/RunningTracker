@@ -9,20 +9,33 @@ import java.util.UUID;
  */
 
 public class SensorCharacteristicAdapter {
+    private static final byte[] OFF = new byte[]{
+            0, 0, 0, 0, 0
+    };
+
+    private static final byte[] ON = new byte[] {
+            0b1111, 0b1111, 0b1111, 0b1111, 0b1111, 0b1111
+    };
+
     /**
      * Create a BLE Characteristic
-     * @param value <= 0 = low intesinty, >= 1 = high intensitiy
-     * @return
+     * @param off off?
+     * @return characteristic
      */
-    public BluetoothGattCharacteristic createCharacteristic(int value) {
-        if (value <= 0) {
-            value = 0;
-        } else {
-            value = 1;
-        }
+    public static BluetoothGattCharacteristic createCharacteristic(boolean off) {
+        byte[] newValue = off ? OFF : ON;
 
-        UUID CharID = UUID.fromString("lol");
+        UUID CharID = UUID.fromString("68084313-9757-420f-9f75-bf7f51f1f1bc");
 
-       return null;
+        BluetoothGattCharacteristic characteristic =
+                new BluetoothGattCharacteristic(
+                        CharID,
+                        BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE,
+                        BluetoothGattCharacteristic.PERMISSION_READ
+                );
+
+        characteristic.setValue(newValue);
+
+        return characteristic;
     }
 }
