@@ -37,7 +37,7 @@ public class BluetoothConnectionActivity extends Activity {
      */
     public static final int REQUEST_SCAN_BLE = 2;
     private static final int REQUEST_ENABLE_BT = 4;
-    private static final long SCAN_PERIOD = 10000;
+    private static final long SCAN_PERIOD = 500;
 
     /**
      * Intent extra key for the device address.
@@ -119,6 +119,8 @@ public class BluetoothConnectionActivity extends Activity {
             public void run() {
                 mScanning = false;
                 scanner.stopScan(mLeScanCallback);
+                Log.i(TAG, "Stop scan");
+                finish();
             }
         }, SCAN_PERIOD);
 

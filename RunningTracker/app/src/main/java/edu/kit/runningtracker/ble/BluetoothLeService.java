@@ -122,26 +122,19 @@ public class BluetoothLeService {
     }
 
     /**
-     * Disconnects the connected device.
+     * Disconnect from gatt service and close connection
      */
-    public void disconnect() {
+    public void cleanUp() {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w(TAG, "BluetoothAdapter not initialized");
             return;
         }
         Log.i(TAG, "Disconnecting gatt server");
         mBluetoothGatt.disconnect();
-    }
-
-    /**
-     * Finalizes the gatt.
-     */
-    public void close() {
-        if (mBluetoothGatt == null) {
-            return;
-        }
-        Log.i(TAG, "Closing gatt server");
         mBluetoothGatt.close();
+
+        mConnectionState = STATE_DISCONNECTED;
+
         mBluetoothGatt = null;
     }
 

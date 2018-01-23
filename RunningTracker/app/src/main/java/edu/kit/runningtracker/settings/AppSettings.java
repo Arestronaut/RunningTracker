@@ -11,7 +11,7 @@ public class AppSettings {
     private int mDeadzone = 0;
     private int mTolerance = 0;
     private int mSpeed = 10;
-    private boolean mLocal = true;
+    private boolean mLocal = false;
     private boolean mUseLocation = false;
 
     private AppSettings() {

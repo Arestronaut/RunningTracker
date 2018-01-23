@@ -76,21 +76,20 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
 
         mBleService = new BluetoothLeService(context);
         mLocationService = new LocationService(context);
-
-        setupServices();
     }
 
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_SCAN_BLE) {
-            if (resultCode == RESULT_OK && data.getExtras() != null) {
+            if (resultCode == RESULT_OK && data != null) {
                 Bundle extras = data.getExtras();
                 mDeviceAddress = ((String) extras.get(BluetoothConnectionActivity.EXTRA_DEVICE_ADDR));
                 mBleSetup = true;
             }
         }
     }
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -102,6 +101,10 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
             public void onClick(View v) {
                 mStartButton.setEnabled(false);
                 mStopButton.setEnabled(true);
+                if (!mBleSetup ||!mGpsSetup) {
+                    setupServices();
+                }
+
                 startServices();
             }
         });
@@ -123,32 +126,40 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
         return view;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        stopServices();
+        mBleService.cleanUp();
+    }
+
     private Runnable mSpeedPoller = new Runnable() {
         @Override
         public void run() {
-            double speed = mLocationService.getSpeed() * Constants.MPH_IN_METERS_PER_SECOND;
-            mSpeedTextView.append(String.valueOf(speed));
+            double speed = mLocationService.getSpeed();
+            mSpeedTextView.setText(String.valueOf(speed));
 
             int desiredSpeed = (int) AppSettings.getInstance().getDesiredSpeed();
             int tolerance = (int) AppSettings.getInstance().getTolerance();
 
-            int frequency;
+            int period;
 
             if (speed < desiredSpeed - tolerance) {
                 // too slow
-                frequency = Constants.LOW_PERIOD;
+                period = Constants.LOW_PERIOD;
                 mIsOff = !mIsOff;
 
                 mInformationTextView.setText("Too slow");
             } else if (speed > desiredSpeed + tolerance) {
                 // too fast
-                frequency = Constants.HIGH_PERIOD;
+                period = Constants.HIGH_PERIOD;
                 mIsOff = !mIsOff;
 
                 mInformationTextView.setText("Too fast");
             } else {
                 // OFF
-                frequency = Constants.OFF_PERIOD;
+                period = Constants.OFF_PERIOD;
                 mIsOff = true;
 
                 mInformationTextView.setText("Right speed");
@@ -163,7 +174,7 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
                 }
             }
 
-            mHandler.postDelayed(this, frequency);
+            mHandler.postDelayed(this, period);
         }
     };
 
@@ -174,6 +185,7 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
         if (requestCode == REQUEST_GPS_PERMISSIONS)
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            Log.i(TAG, "Gps is set up");
                 mGpsSetup = true;
             }
     }
@@ -194,12 +206,16 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
                                 Manifest.permission.ACCESS_FINE_LOCATION,
                                 Manifest.permission.ACCESS_COARSE_LOCATION},
                         REQUEST_GPS_PERMISSIONS);
+            } else {
+                mGpsSetup = true;
             }
         }
     }
 
     private void startServices() {
-        if (!AppSettings.getInstance().isLocal() && mBleSetup) {
+        if (!AppSettings.getInstance().isLocal()
+                && mBleSetup
+                && mBleService.getConnectionState() == BluetoothLeService.STATE_CONNECTED) {
             mBleService.connect(mDeviceAddress);
         }
 
@@ -212,6 +228,5 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
     private void stopServices() {
         mHandler.removeCallbacks(mSpeedPoller);
         mLocationService.stop();
-        mBleService.disconnect();
     }
 }

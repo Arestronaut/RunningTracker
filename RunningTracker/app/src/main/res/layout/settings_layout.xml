@@ -7,7 +7,7 @@
     <TextView
         android:id="@+id/desired_speed_title"
         android:layout_width="match_parent"
-        android:layout_height="41dp"
+        android:layout_height="wrap_content"
         android:text="@string/desired_speed_header" />
 
     <TextView
@@ -19,14 +19,14 @@
     <SeekBar
         android:id="@+id/desired_speed_bar"
         android:layout_width="match_parent"
-        android:layout_height="54dp"
-        android:max="100"
+        android:layout_height="wrap_content"
+        android:max="30"
         android:progress="10"/>
 
     <TextView
         android:id="@+id/tolerance_title"
         android:layout_width="match_parent"
-        android:layout_height="33dp"
+        android:layout_height="wrap_content"
         android:text="@string/tolerance_header" />
 
     <TextView
@@ -38,8 +38,8 @@
     <SeekBar
         android:id="@+id/tolerance_bar"
         android:layout_width="match_parent"
-        android:layout_height="54dp"
-        android:max="100"
+        android:layout_height="wrap_content"
+        android:max="30"
         android:progress="0"/>
 
 
@@ -50,13 +50,13 @@
         <TextView
             android:id="@+id/speed_title"
             android:layout_width="match_parent"
-            android:layout_height="33dp"
-            android:text="Speed" />
+            android:layout_height="wrap_content"
+            android:text="@string/speed" />
         <CheckBox
             android:id="@+id/uselocation_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="use location"/>
+            android:text="@string/use_location"/>
     </LinearLayout>
 
     <TextView
@@ -70,22 +70,19 @@
         android:id="@+id/speed_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:max="100"
+        android:max="30"
         android:progress="10"/>
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="50dp" />
+        android:layout_height="wrap_content"
+        android:layout_weight="0.01"/>
 
     <CheckBox
         android:id="@+id/local_checkbox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/local_checkbox" />
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="50dp" />
 
     <Button
         android:id="@+id/button_save"

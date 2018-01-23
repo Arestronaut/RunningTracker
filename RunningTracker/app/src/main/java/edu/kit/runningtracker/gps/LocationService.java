@@ -2,6 +2,7 @@ package edu.kit.runningtracker.gps;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -11,9 +12,12 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import edu.kit.runningtracker.settings.AppSettings;
+import edu.kit.runningtracker.settings.Constants;
+
+import static android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS;
 
 /**
- * @author Josh Romanowski
+ * @author Raoul Schwagmeier
  */
 
 public class LocationService {
@@ -36,7 +40,7 @@ public class LocationService {
         public void onLocationChanged(Location location) {
             Log.d(TAG, "Location changed : " + location);
             if (location.getSpeed() >= mAppSettings.getDeadzone()) {
-                mSpeed = location.getSpeed();
+                mSpeed = location.getSpeed() * Constants.MS_IN_KMH;
             }
         }
 
@@ -52,7 +56,10 @@ public class LocationService {
 
         @Override
         public void onProviderDisabled(String s) {
-
+            if(s.equals(LocationManager.GPS_PROVIDER)) {
+                Intent gpsIntent = new Intent(ACTION_LOCATION_SOURCE_SETTINGS);
+                mContext.startActivity(gpsIntent);
+            }
         }
     };
 
@@ -69,9 +76,14 @@ public class LocationService {
                 return;
             }
 
-            Log.i(TAG, "Stop receiving location updates");
+            Log.i(TAG, "Start receiving location updates");
+
+            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                    Constants.HIGH_PERIOD / 2, 0, mListener);
             mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                    0, 0, mListener);
+                    Constants.HIGH_PERIOD / 2,
+                    0,
+                    mListener);
         } else {
             Log.w(TAG, "Missing permissions");
         }
