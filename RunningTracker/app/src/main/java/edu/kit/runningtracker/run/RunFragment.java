@@ -2,6 +2,7 @@ package edu.kit.runningtracker.run;
 
 
 import android.Manifest;
+import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -21,17 +22,15 @@ import android.widget.TextView;
 import edu.kit.runningtracker.R;
 import edu.kit.runningtracker.ble.BluetoothConnectionActivity;
 import edu.kit.runningtracker.ble.BluetoothLeService;
-import edu.kit.runningtracker.ble.SensorCharacteristicAdapter;
 import edu.kit.runningtracker.data.LocationRepository;
 import edu.kit.runningtracker.gps.LocationService;
 import edu.kit.runningtracker.settings.AppSettings;
 import edu.kit.runningtracker.settings.Constants;
 
-import static android.app.Activity.RESULT_OK;
 import static edu.kit.runningtracker.ble.BluetoothConnectionActivity.REQUEST_SCAN_BLE;
 
 /**
- * @author Josh Romanowski
+ * @author Raoul Schwagmeier
  */
 
 public class RunFragment extends Fragment implements OnRequestPermissionsResultCallback {
@@ -76,34 +75,35 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
 
         mBleService = new BluetoothLeService(context);
         mLocationService = new LocationService(context);
+
+        setupServices();
     }
 
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_SCAN_BLE) {
-            if (resultCode == RESULT_OK && data != null) {
+            if (data != null) {
                 Bundle extras = data.getExtras();
                 mDeviceAddress = ((String) extras.get(BluetoothConnectionActivity.EXTRA_DEVICE_ADDR));
                 mBleSetup = true;
+
+                mStartButton.setEnabled(true);
             }
         }
     }
-
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.run_layout, container, false);
 
         mStartButton = view.findViewById(R.id.start_button);
+        mStartButton.setEnabled(false);
         mStartButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mStartButton.setEnabled(false);
                 mStopButton.setEnabled(true);
-                if (!mBleSetup ||!mGpsSetup) {
-                    setupServices();
-                }
 
                 startServices();
             }
@@ -166,11 +166,15 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
             }
 
             if (!AppSettings.getInstance().isLocal()) {
-                if (mBleService == null
-                        || mBleService.getConnectionState() != BluetoothLeService.STATE_CONNECTED) {
-                    mBleService.writeCharacteristic(SensorCharacteristicAdapter.
-                            createCharacteristic(mIsOff));
-                    Log.w(TAG, "Service not connected");
+                if (mBleService != null
+                        && mBleService.getConnectionState() == BluetoothLeService.STATE_CONNECTED) {
+                    BluetoothGattCharacteristic characteristic =
+                            mBleService.getCharacteristic(Constants.SERVICE_NAME,
+                                    Constants.CHARACTERISTIC_ID);
+                    int value = mIsOff ? Constants.OFF : Constants.ON;
+
+                    characteristic.setValue(value, BluetoothGattCharacteristic.FORMAT_UINT32, 0);
+                    mBleService.writeCharacteristic(characteristic);
                 }
             }
 
@@ -214,8 +218,7 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
 
     private void startServices() {
         if (!AppSettings.getInstance().isLocal()
-                && mBleSetup
-                && mBleService.getConnectionState() == BluetoothLeService.STATE_CONNECTED) {
+                && mBleSetup) {
             mBleService.connect(mDeviceAddress);
         }
 

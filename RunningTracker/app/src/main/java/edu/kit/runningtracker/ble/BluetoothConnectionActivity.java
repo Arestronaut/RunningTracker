@@ -37,7 +37,7 @@ public class BluetoothConnectionActivity extends Activity {
      */
     public static final int REQUEST_SCAN_BLE = 2;
     private static final int REQUEST_ENABLE_BT = 4;
-    private static final long SCAN_PERIOD = 500;
+    private static final long SCAN_PERIOD = 30000;
 
     /**
      * Intent extra key for the device address.
@@ -56,7 +56,9 @@ public class BluetoothConnectionActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         mFilters = new LinkedList<>();
-        mFilters.add(new ScanFilter.Builder().setServiceUuid(Constants.SERVICE_NAME).build());
+        mFilters.add(new ScanFilter.Builder().setDeviceAddress("C0:CD:53:90:D7:DD").build());
+        //mFilters.add(new ScanFilter.Builder().setServiceUuid(Constants.SERVICE_NAME).build());
+        //mFilters.add(new ScanFilter.Builder().);
         mScanSettings = new ScanSettings.Builder().
                 setScanMode(ScanSettings.SCAN_MODE_LOW_POWER).build();
 
@@ -71,11 +73,6 @@ public class BluetoothConnectionActivity extends Activity {
         if (mBluetoothAdapter == null) {
             Log.e(TAG, "Unable to obtain a BluetoothAdapter.");
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
 
         // Enable bluetooth
         if (this.mBluetoothAdapter == null || !this.mBluetoothAdapter.isEnabled()) {
@@ -97,34 +94,41 @@ public class BluetoothConnectionActivity extends Activity {
         return mScanning;
     }
 
-    private ScanCallback mLeScanCallback =
-            new ScanCallback() {
-                @Override
-                public void onScanResult(int callbackType, ScanResult result) {
-                    super.onScanResult(callbackType, result);
-                    BluetoothDevice device = result.getDevice();
-                    Intent data = new Intent();
-                    data.putExtra(EXTRA_DEVICE_ADDR, device.getAddress());
-                    setResult(REQUEST_SCAN_BLE, data);
-                    finish();
-                }
-            };
 
     private void scanLeDevice() {
         final BluetoothLeScanner scanner = mBluetoothAdapter.getBluetoothLeScanner();
+
+        final ScanCallback leScanCallback = new ScanCallback() {
+            @Override
+            public void onScanResult(int callbackType, ScanResult result) {
+                super.onScanResult(callbackType, result);
+
+                if (mScanning) {
+                    mScanning = false;
+                    BluetoothDevice device = result.getDevice();
+                        Intent data = new Intent();
+                        data.putExtra(EXTRA_DEVICE_ADDR, device.getAddress());
+                        Log.i(TAG, "Found device: " + device.getName());
+                        scanner.stopScan(this);
+                        setResult(REQUEST_SCAN_BLE, data);
+                        finish();
+                }
+            }
+        };
 
         // Stops scanning after a pre-defined scan period.
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 mScanning = false;
-                scanner.stopScan(mLeScanCallback);
-                Log.i(TAG, "Stop scan");
+                scanner.stopScan(leScanCallback);
+                Log.i(TAG, "Stop scaning BLE");
                 finish();
             }
         }, SCAN_PERIOD);
 
+        scanner.startScan(mFilters, mScanSettings, leScanCallback);
+        Log.i(TAG, "Start scanning BLE");
         mScanning = true;
-        scanner.startScan(mFilters, mScanSettings, mLeScanCallback);
     }
 }

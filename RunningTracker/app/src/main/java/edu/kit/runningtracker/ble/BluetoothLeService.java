@@ -11,7 +11,10 @@ import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.util.Log;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Service for managing a ble connection to a given device.
@@ -98,7 +101,7 @@ public class BluetoothLeService {
         }
 
         // Previously connected device.  Try to reconnect.
-        if (mBluetoothDeviceAddress != null && address.equals(mBluetoothDeviceAddress)
+        /*if (mBluetoothDeviceAddress != null && address.equals(mBluetoothDeviceAddress)
                 && mBluetoothGatt != null) {
             Log.d(TAG, "Trying to use an existing mBluetoothGatt for connection.");
             if (mBluetoothGatt.connect()) {
@@ -107,7 +110,7 @@ public class BluetoothLeService {
             } else {
                 return false;
             }
-        }
+        }*/
 
         final BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
         if (device == null) {
@@ -138,10 +141,14 @@ public class BluetoothLeService {
         mBluetoothGatt = null;
     }
 
-    public List<BluetoothGattService> getSupportedGattServices() {
-        if (mBluetoothGatt == null) return null;
+    public BluetoothGattCharacteristic getCharacteristic(String serviceID, String characteristicsID) {
+        if (mBluetoothGatt == null
+                || serviceID.isEmpty()
+                || characteristicsID.isEmpty()) return null;
 
-        return mBluetoothGatt.getServices();
+        BluetoothGattService service = mBluetoothGatt.
+                getService(UUID.fromString(serviceID));
+        return service.getCharacteristic(UUID.fromString(characteristicsID));
     }
 
     /**
@@ -155,15 +162,12 @@ public class BluetoothLeService {
             return;
         }
 
-        BluetoothGattService service = getSupportedGattServices().iterator().next();
-        if (service == null) {
-            Log.e(TAG, "No service available");
-            return;
-        }
-
         if (!mBluetoothGatt.writeCharacteristic(characteristic)) {
             Log.e(TAG, "Initializing writing characteristic failed");
         }
+
+        Log.i(TAG, "Writing characteristic: " + characteristic.getUuid());
+        Log.i(TAG, "Data: " + Arrays.toString(characteristic.getValue()));
     }
 
     public int getConnectionState() {
