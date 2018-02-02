@@ -83,12 +83,17 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
+        switch (resultCode) {
             case REQUEST_SCAN_BLE:
                 if (data != null) {
                     Bundle extras = data.getExtras();
                     mDeviceAddress = ((String) extras.get(BluetoothConnectionActivity.EXTRA_DEVICE_ADDR));
                     mBleSetup = true;
+
+                    Toast.makeText(getContext(),
+                            "Found device",
+                            Toast.LENGTH_LONG)
+                            .show();
 
                     mStartButton.setEnabled(true);
                 }
@@ -148,13 +153,17 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
         mStopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mStopButton.setEnabled(false);
-                mStartButton.setEnabled(true);
-                stopServices();
+                stop();
             }
         });
 
         return view;
+    }
+
+    private void stop() {
+        mStopButton.setEnabled(false);
+        mStartButton.setEnabled(true);
+        stopServices();
     }
 
     @Override
@@ -170,6 +179,22 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
 
         stopServices();
         mBleService.cleanUp();
+    }
+
+    public void reinitiateBluetooth() {
+        stop();
+
+        this.mBleSetup = false;
+
+        setupBluetooth();
+    }
+
+    public void reinitiateGPS() {
+        stop();
+
+        this.mGpsSetup = false;
+
+        this.setupGPS();
     }
 
     private Runnable mSpeedPoller = new Runnable() {
@@ -233,12 +258,20 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
     }
 
     protected void setupServices() {
+        setupBluetooth();
+        setupGPS();
+    }
+
+    private void setupBluetooth() {
         if (!AppSettings.getInstance().isLocal() && !mBleSetup) {
             Intent startBleIntent = new Intent(getContext(), BluetoothConnectionActivity.class);
             startBleIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startBleIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivityForResult(startBleIntent, REQUEST_SCAN_BLE);
         }
+    }
 
+    private void setupGPS() {
         if (!mGpsSetup) {
             if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED

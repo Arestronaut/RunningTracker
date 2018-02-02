@@ -91,7 +91,10 @@ public class LocationService {
 
     public void stop() {
         Log.i(TAG, "Stop receiving location updates");
-        mLocationManager.removeUpdates(mListener);
+
+        if (mLocationManager != null) {
+            mLocationManager.removeUpdates(mListener);
+        }
     }
 
     public double getSpeed() {

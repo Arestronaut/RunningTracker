@@ -18,6 +18,8 @@ import android.util.Log;
 
 import java.util.LinkedList;
 
+import edu.kit.runningtracker.settings.Constants;
+
 
 /**
  * Activity that can be used for scanning BLE devices.
@@ -38,7 +40,7 @@ public class BluetoothConnectionActivity extends Activity {
     private static final int REQUEST_ENABLE_BT = 5;
     public static final int BT_PERMISSION_NOT_GRANTED = 6;
     public static final int BT_ERROR = 7;
-    private static final long SCAN_PERIOD = 30000;
+    private static final long SCAN_PERIOD = 5000;
 
     /**
      * Intent extra key for the device address.
@@ -65,7 +67,7 @@ public class BluetoothConnectionActivity extends Activity {
         }
 
         mFilters = new LinkedList<>();
-        mFilters.add(new ScanFilter.Builder().setDeviceAddress("C0:CD:53:90:D7:DD").build());
+        mFilters.add(new ScanFilter.Builder().setDeviceAddress(Constants.DEVICE_ID).build());
 
         mScanSettings = new ScanSettings.Builder().
                 setScanMode(ScanSettings.SCAN_MODE_LOW_POWER).build();

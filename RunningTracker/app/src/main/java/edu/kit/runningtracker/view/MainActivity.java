@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import edu.kit.runningtracker.R;
@@ -61,7 +62,13 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_bluetooth:
-                viewPager.setAdapter(adapter);
+                //viewPager.setAdapter(adapter);
+
+                for (Fragment fragment : this.adapter.mFragmentList) {
+                    if (fragment instanceof RunFragment) {
+                        ((RunFragment) fragment).reinitiateBluetooth();
+                    }
+                }
 
                 return true;
             default:

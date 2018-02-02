@@ -7,6 +7,7 @@ import android.os.ParcelUuid;
  */
 
 public class Constants {
+    public static String DEVICE_ID = "C0:CD:53:90:D7:DD";
     public static String SERVICE_NAME =     "713D0000-503E-4C75-BA94-3148F18D941E";
     public static String CHARACTERISTIC_ID = "713D0003-503E-4C75-BA94-3148F18D941E";
 
