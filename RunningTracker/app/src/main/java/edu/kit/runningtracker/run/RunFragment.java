@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityCompat.OnRequestPermissionsResultCallback;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import edu.kit.runningtracker.R;
 import edu.kit.runningtracker.ble.BluetoothConnectionActivity;
@@ -27,6 +29,10 @@ import edu.kit.runningtracker.gps.LocationService;
 import edu.kit.runningtracker.settings.AppSettings;
 import edu.kit.runningtracker.settings.Constants;
 
+import static edu.kit.runningtracker.ble.BluetoothConnectionActivity.BLE_NOT_SUPPORTED;
+import static edu.kit.runningtracker.ble.BluetoothConnectionActivity.BT_ERROR;
+import static edu.kit.runningtracker.ble.BluetoothConnectionActivity.BT_PERMISSION_NOT_GRANTED;
+import static edu.kit.runningtracker.ble.BluetoothConnectionActivity.REQUEST_NO_DEVICE_FOUND;
 import static edu.kit.runningtracker.ble.BluetoothConnectionActivity.REQUEST_SCAN_BLE;
 
 /**
@@ -47,7 +53,6 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
     // Sensors and actors
     private BluetoothLeService mBleService;
     private LocationService mLocationService;
-    private LocationRepository mLocationRepository;
 
     private boolean mBleSetup;
     private boolean mGpsSetup;
@@ -58,8 +63,6 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
     private Handler mHandler;
 
     public RunFragment() {
-        mLocationRepository = new LocationRepository();
-
         mBleSetup = false;
         mGpsSetup = false;
 
@@ -75,21 +78,49 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
 
         mBleService = new BluetoothLeService(context);
         mLocationService = new LocationService(context);
-
-        setupServices();
     }
 
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_SCAN_BLE) {
-            if (data != null) {
-                Bundle extras = data.getExtras();
-                mDeviceAddress = ((String) extras.get(BluetoothConnectionActivity.EXTRA_DEVICE_ADDR));
-                mBleSetup = true;
+        switch (requestCode) {
+            case REQUEST_SCAN_BLE:
+                if (data != null) {
+                    Bundle extras = data.getExtras();
+                    mDeviceAddress = ((String) extras.get(BluetoothConnectionActivity.EXTRA_DEVICE_ADDR));
+                    mBleSetup = true;
 
-                mStartButton.setEnabled(true);
-            }
+                    mStartButton.setEnabled(true);
+                }
+                break;
+            case BLE_NOT_SUPPORTED:
+                Toast.makeText(getContext(),
+                        "BLE is not supported on this device.",
+                        Toast.LENGTH_LONG)
+                        .show();
+                break;
+            case REQUEST_NO_DEVICE_FOUND:
+                Toast.makeText(getContext(),
+                        "The requested device could not be found",
+                        Toast.LENGTH_LONG)
+                        .show();
+
+                break;
+            case BT_PERMISSION_NOT_GRANTED:
+                Toast.makeText(getContext(),
+                        "The permission to use Bluetooth is not granted",
+                        Toast.LENGTH_LONG)
+                        .show();
+                break;
+            case BT_ERROR:
+                Toast.makeText(getContext(),
+                        "An error occurred while trying to build up a BT connection",
+                        Toast.LENGTH_LONG)
+                        .show();
+                break;
+            default:
+                Log.e(TAG, "Activity ended due to an unknown reason");
+                break;
         }
     }
 
@@ -124,6 +155,13 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
         });
 
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        setupServices();
     }
 
     @Override
@@ -197,6 +235,7 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
     protected void setupServices() {
         if (!AppSettings.getInstance().isLocal() && !mBleSetup) {
             Intent startBleIntent = new Intent(getContext(), BluetoothConnectionActivity.class);
+            startBleIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivityForResult(startBleIntent, REQUEST_SCAN_BLE);
         }
 
@@ -229,6 +268,19 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
     }
 
     private void stopServices() {
+        // Send Stop signal
+        if (!AppSettings.getInstance().isLocal()) {
+            if (mBleService != null
+                    && mBleService.getConnectionState() == BluetoothLeService.STATE_CONNECTED) {
+                BluetoothGattCharacteristic characteristic =
+                        mBleService.getCharacteristic(Constants.SERVICE_NAME,
+                                Constants.CHARACTERISTIC_ID);
+
+                characteristic.setValue(Constants.OFF, BluetoothGattCharacteristic.FORMAT_UINT32, 0);
+                mBleService.writeCharacteristic(characteristic);
+            }
+        }
+
         mHandler.removeCallbacks(mSpeedPoller);
         mLocationService.stop();
     }

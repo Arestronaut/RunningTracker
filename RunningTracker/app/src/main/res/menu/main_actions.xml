@@ -5,9 +5,4 @@
         android:icon="@android:drawable/stat_sys_data_bluetooth"
         android:title="Bluetooth"
         app:showAsAction="ifRoom" />
-
-    <item android:id="@+id/action_gps"
-        android:icon="@android:drawable/ic_menu_mylocation"
-        android:title="Bluetooth"
-        app:showAsAction="ifRoom" />
 </menu>

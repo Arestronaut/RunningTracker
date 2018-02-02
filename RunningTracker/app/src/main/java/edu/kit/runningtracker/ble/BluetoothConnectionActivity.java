@@ -15,12 +15,9 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.LinkedList;
 
-import edu.kit.runningtracker.R;
-import edu.kit.runningtracker.settings.Constants;
 
 /**
  * Activity that can be used for scanning BLE devices.
@@ -36,7 +33,11 @@ public class BluetoothConnectionActivity extends Activity {
      * Request code for the activity.
      */
     public static final int REQUEST_SCAN_BLE = 2;
-    private static final int REQUEST_ENABLE_BT = 4;
+    public static final int REQUEST_NO_DEVICE_FOUND = 3;
+    public static final int BLE_NOT_SUPPORTED = 4;
+    private static final int REQUEST_ENABLE_BT = 5;
+    public static final int BT_PERMISSION_NOT_GRANTED = 6;
+    public static final int BT_ERROR = 7;
     private static final long SCAN_PERIOD = 30000;
 
     /**
@@ -46,6 +47,7 @@ public class BluetoothConnectionActivity extends Activity {
 
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
+    private BluetoothDevice mDevice;
 
     private boolean mScanning;
     private LinkedList<ScanFilter> mFilters;
@@ -55,10 +57,16 @@ public class BluetoothConnectionActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // at first check if BLE is supported on the current device
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+            Log.e(TAG, "BLE is not supported");
+            setResult(BLE_NOT_SUPPORTED);
+            finish();
+        }
+
         mFilters = new LinkedList<>();
         mFilters.add(new ScanFilter.Builder().setDeviceAddress("C0:CD:53:90:D7:DD").build());
-        //mFilters.add(new ScanFilter.Builder().setServiceUuid(Constants.SERVICE_NAME).build());
-        //mFilters.add(new ScanFilter.Builder().);
+
         mScanSettings = new ScanSettings.Builder().
                 setScanMode(ScanSettings.SCAN_MODE_LOW_POWER).build();
 
@@ -66,34 +74,41 @@ public class BluetoothConnectionActivity extends Activity {
             mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
             if (mBluetoothManager == null) {
                 Log.e(TAG, "Unable to initialize BluetoothManager.");
+                setResult(BT_ERROR);
+                finish();
             }
         }
 
         mBluetoothAdapter = mBluetoothManager.getAdapter();
         if (mBluetoothAdapter == null) {
             Log.e(TAG, "Unable to obtain a BluetoothAdapter.");
-        }
-
-        // Enable bluetooth
-        if (this.mBluetoothAdapter == null || !this.mBluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        }
-
-        // Check for BLE support
-        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            Toast.makeText(this, R.string.ble_not_supported,
-                    Toast.LENGTH_SHORT).show();
             finish();
         }
 
-        scanLeDevice();
+        // Enable bluetooth
+        if (!this.mBluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        } else {
+            scanLeDevice();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_ENABLE_BT) {
+            scanLeDevice();
+        } else {
+            setResult(BT_PERMISSION_NOT_GRANTED);
+            finish();
+        }
     }
 
     public boolean isScanning() {
         return mScanning;
     }
-
 
     private void scanLeDevice() {
         final BluetoothLeScanner scanner = mBluetoothAdapter.getBluetoothLeScanner();
@@ -105,14 +120,22 @@ public class BluetoothConnectionActivity extends Activity {
 
                 if (mScanning) {
                     mScanning = false;
-                    BluetoothDevice device = result.getDevice();
-                        Intent data = new Intent();
-                        data.putExtra(EXTRA_DEVICE_ADDR, device.getAddress());
-                        Log.i(TAG, "Found device: " + device.getName());
-                        scanner.stopScan(this);
-                        setResult(REQUEST_SCAN_BLE, data);
-                        finish();
+                    mDevice = result.getDevice();
+                    Intent data = new Intent();
+                    data.putExtra(EXTRA_DEVICE_ADDR, mDevice.getAddress());
+                    Log.i(TAG, "Found device: " + mDevice.getName());
+                    scanner.stopScan(this);
+                    setResult(REQUEST_SCAN_BLE, data);
+                    finish();
                 }
+            }
+
+            @Override
+            public void onScanFailed(int errorCode) {
+                super.onScanFailed(errorCode);
+
+                setResult(BT_ERROR);
+                finish();
             }
         };
 
@@ -123,6 +146,11 @@ public class BluetoothConnectionActivity extends Activity {
                 mScanning = false;
                 scanner.stopScan(leScanCallback);
                 Log.i(TAG, "Stop scaning BLE");
+
+                if (mDevice == null) {
+                    setResult(REQUEST_NO_DEVICE_FOUND);
+                }
+
                 finish();
             }
         }, SCAN_PERIOD);
