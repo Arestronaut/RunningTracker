@@ -5,4 +5,5 @@
         android:icon="@android:drawable/stat_sys_data_bluetooth"
         android:title="Bluetooth"
         app:showAsAction="ifRoom" />
+
 </menu>

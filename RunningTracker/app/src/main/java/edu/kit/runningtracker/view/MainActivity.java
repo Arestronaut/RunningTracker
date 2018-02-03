@@ -30,6 +30,7 @@ import edu.kit.runningtracker.settings.SettingsFragment;
 public class MainActivity extends AppCompatActivity {
     private ViewPager viewPager;
     private CustomPagerAdapter adapter;
+    private Menu mMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,11 +50,14 @@ public class MainActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_actions, menu);
 
-        Drawable drawable = menu.findItem(R.id.action_bluetooth).getIcon();
-        if (drawable != null) {
-            drawable.mutate();
-            drawable.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
+        Drawable btDrawable = menu.findItem(R.id.action_bluetooth).getIcon();
+
+        if (btDrawable != null) {
+            btDrawable.mutate();
+            btDrawable.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
         }
+
+        this.mMenu = menu;
 
         return true;
     }
@@ -73,6 +77,13 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             default:
                 return false;
+        }
+    }
+
+    public void toggleMenuItem() {
+        if (this.mMenu != null) {
+            MenuItem item = this.mMenu.getItem(0);
+            item.setEnabled(!item.isEnabled());
         }
     }
 

@@ -26,7 +26,7 @@ import java.util.UUID;
 public class BluetoothLeService {
     private static final String TAG = BluetoothLeService.class.getSimpleName();
 
-    private static final int STATE_DISCONNECTED = 0;
+    public static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
     /**
      * Service is currently connected and ready for actions.
@@ -40,13 +40,15 @@ public class BluetoothLeService {
     private int mConnectionState = STATE_DISCONNECTED;
 
     private Context mContext;
+    private ServiceDelegate mDelegate;
 
     /**
      * Creates a new <code>BluetoothLeService</code> and initializes Bluetooth.
      * @param context current app context.
      */
-    public BluetoothLeService(Context context) {
+    public BluetoothLeService(Context context, ServiceDelegate delegate) {
         mContext = context;
+        mDelegate = delegate;
 
         if (mBluetoothManager == null) {
             mBluetoothManager = (BluetoothManager) mContext.getSystemService(Context.BLUETOOTH_SERVICE);
@@ -71,9 +73,11 @@ public class BluetoothLeService {
                 Log.i(TAG, "Attempting to start service discovery:" +
                         mBluetoothGatt.discoverServices());
 
+                mDelegate.connectionStateChanged(STATE_CONNECTED);
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 mConnectionState = STATE_DISCONNECTED;
                 Log.i(TAG, "Disconnected from GATT server.");
+                mDelegate.connectionStateChanged(STATE_DISCONNECTED);
             }
         }
 
