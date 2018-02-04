@@ -80,10 +80,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void toggleMenuItem() {
+    public void setMenuEnabled(Boolean enabled) {
         if (this.mMenu != null) {
             MenuItem item = this.mMenu.getItem(0);
-            item.setEnabled(!item.isEnabled());
+            item.setEnabled(enabled);
         }
     }
 

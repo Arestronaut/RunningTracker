@@ -2,14 +2,10 @@ package edu.kit.runningtracker.run;
 
 
 import android.Manifest;
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGattCharacteristic;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -19,7 +15,6 @@ import android.support.v4.app.ActivityCompat.OnRequestPermissionsResultCallback;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -29,13 +24,11 @@ import android.widget.Toast;
 import edu.kit.runningtracker.R;
 import edu.kit.runningtracker.ble.BluetoothConnectionActivity;
 import edu.kit.runningtracker.ble.BluetoothLeService;
-import edu.kit.runningtracker.ble.ServiceDelegate;
 import edu.kit.runningtracker.gps.LocationService;
 import edu.kit.runningtracker.settings.AppSettings;
 import edu.kit.runningtracker.settings.Constants;
 import edu.kit.runningtracker.view.MainActivity;
 
-import static android.content.Context.BLUETOOTH_SERVICE;
 import static edu.kit.runningtracker.ble.BluetoothConnectionActivity.BLE_NOT_SUPPORTED;
 import static edu.kit.runningtracker.ble.BluetoothConnectionActivity.BT_ERROR;
 import static edu.kit.runningtracker.ble.BluetoothConnectionActivity.BT_PERMISSION_NOT_GRANTED;
@@ -83,7 +76,7 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        mBleService = new BluetoothLeService(context, mDelegate);
+        mBleService = new BluetoothLeService(context);
         mLocationService = new LocationService(context);
     }
 
@@ -96,15 +89,14 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
                     mDeviceAddress = ((String) extras.get(BluetoothConnectionActivity.EXTRA_DEVICE_ADDR));
                     mBleSetup = true;
 
-                    /* Toast.makeText(getContext(),
+                    Toast.makeText(getContext(),
                             "Found device",
                             Toast.LENGTH_LONG)
-                            .show(); */
+                            .show();
 
                     connectToBleDevice();
-
-                    mStartButton.setEnabled(true);
                 }
+
                 break;
             case BLE_NOT_SUPPORTED:
                 Toast.makeText(getContext(),
@@ -149,7 +141,7 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
                 mStartButton.setEnabled(false);
                 mStopButton.setEnabled(true);
 
-                ((MainActivity) getActivity()).toggleMenuItem();
+                ((MainActivity) getActivity()).setMenuEnabled(false);
 
                 startServices();
             }
@@ -174,7 +166,7 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
         mStopButton.setEnabled(false);
         mStartButton.setEnabled(true);
 
-        ((MainActivity) getActivity()).toggleMenuItem();
+        ((MainActivity) getActivity()).setMenuEnabled(true);
 
         stopServices();
     }
@@ -184,6 +176,8 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
         super.onViewCreated(view, savedInstanceState);
 
         setupServices();
+
+        mStartButton.setEnabled(true);
     }
 
     @Override
@@ -211,24 +205,6 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
             }
         }
     }
-
-    private final ServiceDelegate mDelegate = new ServiceDelegate() {
-        @Override
-        public void connectionStateChanged(int state) {
-            switch (state) {
-                case BluetoothLeService.STATE_CONNECTED:
-                    Log.d(TAG, "Now connected");
-
-                    break;
-                case BluetoothLeService.STATE_DISCONNECTED:
-                    Log.d(TAG, "Now disconnected");
-
-                    stopServices();
-
-                    break;
-            }
-        }
-    };
 
     private final Runnable mSpeedPoller = new Runnable() {
         @Override
@@ -282,12 +258,13 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String permissions[], @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_GPS_PERMISSIONS)
+        if (requestCode == REQUEST_GPS_PERMISSIONS) {
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            Log.i(TAG, "Gps is set up");
+                Log.i(TAG, "Gps is set up");
                 mGpsSetup = true;
             }
+        }
     }
 
     protected void setupServices() {

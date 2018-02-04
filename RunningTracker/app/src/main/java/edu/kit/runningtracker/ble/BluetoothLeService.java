@@ -35,20 +35,17 @@ public class BluetoothLeService {
 
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
-    private String mBluetoothDeviceAddress;
     private BluetoothGatt mBluetoothGatt;
     private int mConnectionState = STATE_DISCONNECTED;
 
     private Context mContext;
-    private ServiceDelegate mDelegate;
 
     /**
      * Creates a new <code>BluetoothLeService</code> and initializes Bluetooth.
      * @param context current app context.
      */
-    public BluetoothLeService(Context context, ServiceDelegate delegate) {
+    public BluetoothLeService(Context context) {
         mContext = context;
-        mDelegate = delegate;
 
         if (mBluetoothManager == null) {
             mBluetoothManager = (BluetoothManager) mContext.getSystemService(Context.BLUETOOTH_SERVICE);
@@ -72,12 +69,9 @@ public class BluetoothLeService {
                 // Attempts to discover services after successful connection.
                 Log.i(TAG, "Attempting to start service discovery:" +
                         mBluetoothGatt.discoverServices());
-
-                mDelegate.connectionStateChanged(STATE_CONNECTED);
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 mConnectionState = STATE_DISCONNECTED;
                 Log.i(TAG, "Disconnected from GATT server.");
-                mDelegate.connectionStateChanged(STATE_DISCONNECTED);
             }
         }
 
@@ -110,7 +104,6 @@ public class BluetoothLeService {
         }
         mBluetoothGatt = device.connectGatt(mContext, false, mGattCallback);
         Log.d(TAG, "Trying to create a new connection.");
-        mBluetoothDeviceAddress = address;
         mConnectionState = STATE_CONNECTING;
         return true;
     }
