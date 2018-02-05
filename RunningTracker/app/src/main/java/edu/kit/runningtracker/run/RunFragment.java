@@ -36,7 +36,7 @@ import static edu.kit.runningtracker.ble.BluetoothConnectionActivity.REQUEST_NO_
 import static edu.kit.runningtracker.ble.BluetoothConnectionActivity.REQUEST_SCAN_BLE;
 
 /**
- * @author Raoul Schwagmeier
+ * @author Raoul Schwagmeier / Josh Romanowski
  */
 
 public class RunFragment extends Fragment implements OnRequestPermissionsResultCallback {

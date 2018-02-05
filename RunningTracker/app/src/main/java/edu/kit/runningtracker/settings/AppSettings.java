@@ -1,7 +1,7 @@
 package edu.kit.runningtracker.settings;
 
 /**
- * @author Josh Romanowski
+ * @author Raoul Schwagmeier
  */
 
 public class AppSettings {

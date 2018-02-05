@@ -24,7 +24,7 @@ import edu.kit.runningtracker.run.RunFragment;
 import edu.kit.runningtracker.settings.SettingsFragment;
 
 /**
- * Created by joshr on 19.12.2017.
+ * @author Josh Romanowski
  */
 
 public class MainActivity extends AppCompatActivity {

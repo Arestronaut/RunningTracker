@@ -102,6 +102,7 @@ public class BluetoothLeService {
             Log.w(TAG, "Device not found.  Unable to connect.");
             return false;
         }
+
         mBluetoothGatt = device.connectGatt(mContext, false, mGattCallback);
         Log.d(TAG, "Trying to create a new connection.");
         mConnectionState = STATE_CONNECTING;
@@ -125,6 +126,14 @@ public class BluetoothLeService {
         mBluetoothGatt = null;
     }
 
+
+    /**
+     * Get write characteristic
+     *
+     * @param serviceID Bluetooth service uuid string
+     * @param characteristicsID Characteristics uuid string
+     * @return Characteristic
+     */
     public BluetoothGattCharacteristic getCharacteristic(String serviceID, String characteristicsID) {
         if (mBluetoothGatt == null
                 || serviceID.isEmpty()
@@ -138,7 +147,6 @@ public class BluetoothLeService {
     /**
      * Writes a characteristic to the gatt server. Skips if gatt not available.
      * @param characteristic the characteristic
-     *
      */
     public void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
         if (mBluetoothGatt == null || mConnectionState != STATE_CONNECTED) {

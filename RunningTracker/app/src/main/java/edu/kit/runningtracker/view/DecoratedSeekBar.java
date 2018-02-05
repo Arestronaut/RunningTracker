@@ -4,7 +4,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 /**
- * Created by joshr on 26.12.2017.
+ * @author Josh Romanowski
  */
 
 public class DecoratedSeekBar {

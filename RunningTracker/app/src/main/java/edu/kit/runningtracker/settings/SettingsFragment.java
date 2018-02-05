@@ -15,7 +15,7 @@ import edu.kit.runningtracker.R;
 import edu.kit.runningtracker.view.DecoratedSeekBar;
 
 /**
- * Created by joshr on 19.12.2017.
+ * @author Raoul Schwagmeier
  */
 
 public class SettingsFragment extends Fragment {
