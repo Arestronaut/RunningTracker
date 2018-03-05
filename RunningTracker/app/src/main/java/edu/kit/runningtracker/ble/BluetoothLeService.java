@@ -12,8 +12,6 @@ import android.content.Context;
 import android.util.Log;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -27,10 +25,7 @@ public class BluetoothLeService {
     private static final String TAG = BluetoothLeService.class.getSimpleName();
 
     public static final int STATE_DISCONNECTED = 0;
-    private static final int STATE_CONNECTING = 1;
-    /**
-     * Service is currently connected and ready for actions.
-     */
+    public static final int STATE_CONNECTING = 1;
     public static final int STATE_CONNECTED = 2;
 
     private BluetoothManager mBluetoothManager;

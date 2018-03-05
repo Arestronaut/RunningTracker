@@ -125,7 +125,6 @@ public class BluetoothConnectionActivity extends Activity {
                     mDevice = result.getDevice();
                     Intent data = new Intent();
                     data.putExtra(EXTRA_DEVICE_ADDR, mDevice.getAddress());
-                    //Log.i(TAG, "Found device: " + mDevice.getName());
                     scanner.stopScan(this);
                     setResult(REQUEST_SCAN_BLE, data);
                     finish();

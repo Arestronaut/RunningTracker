@@ -189,11 +189,12 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
     }
 
     public void reinitiateBluetooth() {
-        stop();
-
-        this.mBleSetup = false;
-
-        setupBluetooth();
+        if (mBleService.getConnectionState() != BluetoothLeService.STATE_CONNECTING) {
+            stop();
+            mBleService.cleanUp();
+            this.mBleSetup = false;
+            setupBluetooth();
+        }
     }
 
     private void connectToBleDevice() {
@@ -212,8 +213,8 @@ public class RunFragment extends Fragment implements OnRequestPermissionsResultC
             double speed = mLocationService.getSpeed();
             mSpeedTextView.setText(String.valueOf(speed));
 
-            int desiredSpeed = (int) AppSettings.getInstance().getDesiredSpeed();
-            int tolerance = (int) AppSettings.getInstance().getTolerance();
+            int desiredSpeed = AppSettings.getInstance().getDesiredSpeed();
+            int tolerance = AppSettings.getInstance().getTolerance();
 
             int period;
 
